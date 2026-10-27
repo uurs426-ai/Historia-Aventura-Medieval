@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#6c3df0">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Aventura Medieval – Quiz de História (Android)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg1:#3aa8ff;--bg2:#8e5bff;--card:#fff9e8;--ink:#2b2257;--mut:#6a5f96;--ok:#22b968;--bad:#f2475a;--gold:#ffc83d;--pri:#6c3df0;--line:#2b2257}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg1:#14193f;--bg2:#3a1760;--card:#25295a;--ink:#f6f2ff;--mut:#bdb6e6;--line:#0d0f2b}}
+:root[data-theme="dark"]{color-scheme:dark;--bg1:#14193f;--bg2:#3a1760;--card:#25295a;--ink:#f6f2ff;--mut:#bdb6e6;--line:#0d0f2b}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100%;font-family:'Nunito',system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;overflow-x:hidden}
+h1,h2,h3,button,.fz{font-family:'Fredoka','Trebuchet MS',sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:64px 16px 32px}
+.scr{display:none}.scr.on{display:block}
+#snd{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:10px;z-index:20;display:flex;gap:8px;align-items:center;background:var(--card);border:3px solid var(--line);border-radius:999px;padding:4px 12px 4px 6px;box-shadow:0 4px 0 var(--line)}
+#snd button{border:0;background:none;font-size:22px;cursor:pointer;padding:2px 6px}
+#snd input{width:86px;accent-color:var(--pri)}
+h1{font-size:clamp(34px,9vw,56px);margin:0;color:#fff;text-shadow:0 4px 0 var(--line);line-height:1.05;text-align:center}
+.sub{text-align:center;color:#fff;font-weight:800;margin:8px 0 22px;text-shadow:0 2px 0 var(--line)}
+.panel{background:var(--card);border:4px solid var(--line);border-radius:22px;box-shadow:0 7px 0 var(--line);padding:16px}
+.lv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.lvb{border:4px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);padding:10px 6px;cursor:pointer;box-shadow:0 5px 0 var(--line);font-size:18px;transition:transform .1s}
+.lvb small{display:block;font-family:'Nunito';font-weight:800;color:var(--mut);font-size:13px;margin-top:4px}
+.lvb .e{font-size:34px;display:block}
+.lvb.sel{background:var(--gold);transform:translateY(-4px) rotate(-1.5deg)}
+.lvb.sel small{color:var(--ink)}
+.btn{display:block;width:100%;border:4px solid var(--line);border-radius:18px;padding:12px 14px;font-size:20px;font-weight:700;color:var(--ink);background:var(--card);cursor:pointer;box-shadow:0 5px 0 var(--line);margin-top:12px;text-align:left}
+.btn:active,.lvb:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+.btn.big{background:var(--ok);color:#fff;text-align:center;font-size:28px;padding:16px;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.btn small{display:block;font-family:'Nunito';font-weight:800;color:var(--mut);font-size:13px}
+.hud{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.chip{background:var(--card);border:3px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:800;box-shadow:0 3px 0 var(--line);white-space:nowrap}
+.bar{flex:1;height:18px;border:3px solid var(--line);border-radius:999px;background:var(--card);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--ok);transition:width .25s linear,background .3s}
+.q{font-size:clamp(19px,4.6vw,25px);font-weight:800;line-height:1.35;margin:0 0 14px}
+.tag{display:inline-block;background:var(--pri);color:#fff;border-radius:999px;padding:2px 12px;font-size:14px;margin-bottom:8px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:10px;align-items:center;text-align:left;border:4px solid var(--line);border-radius:16px;background:#fff;color:#2b2257;font-family:'Nunito';font-weight:800;font-size:17px;padding:10px 12px;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.opt b{flex:none;width:32px;height:32px;border-radius:50%;background:var(--gold);display:grid;place-items:center;font-family:'Fredoka'}
+.opt:disabled{cursor:default}.opt.ok{background:var(--ok);color:#fff}.opt.bad{background:var(--bad);color:#fff}
+.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+.row{display:flex;gap:10px;margin-top:14px}.row .btn{margin:0;text-align:center;font-size:17px}
+#fb{display:none;margin-top:12px;border:3px dashed var(--line);border-radius:14px;padding:10px 12px;background:var(--card)}
+#fb strong{font-family:'Fredoka';font-size:20px;display:block}
+.pop{position:fixed;pointer-events:none;font-size:30px;animation:fl 1.1s ease-out forwards;z-index:30}
+@keyframes fl{to{transform:translateY(-140px) rotate(40deg);opacity:0}}
+#over{position:fixed;inset:0;background:rgba(10,8,40,.78);display:none;place-items:center;padding:20px;z-index:40}
+#over .panel{max-width:420px;text-align:center}#over .big{font-size:70px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mc{aspect-ratio:1/1.05;border:4px solid var(--line);border-radius:14px;background:var(--pri);color:#fff;font-size:30px;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--line);padding:4px;text-align:center;font-family:'Nunito';font-weight:800}
+.mc.up{background:#fff;color:#2b2257;font-size:13px}.mc.done{background:var(--ok);color:#fff;font-size:13px}
+details{margin:10px 0;border:3px solid var(--line);border-radius:14px;background:var(--card);box-shadow:0 4px 0 var(--line)}
+summary{font-family:'Fredoka';font-size:20px;font-weight:700;padding:10px 14px;cursor:pointer}
+details ul{margin:0;padding:0 18px 12px 34px;line-height:1.5}
+.tl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.tl span{background:var(--gold);color:#2b2257;border:3px solid var(--line);border-radius:12px;padding:4px 10px;font-weight:800;font-size:14px}
+:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:420px){#snd input{width:60px}.lvb{font-size:16px}}
+html,body{-webkit-tap-highlight-color:transparent;touch-action:manipulation;overscroll-behavior:none}
+body{-webkit-user-select:none;user-select:none;min-height:100dvh}
+.wrap{padding:62px 12px 28px}
+.btn,.opt{min-height:58px}
+.opt{font-size:18px;padding:12px}
+.row{position:sticky;bottom:10px}
+#snd input{width:70px}
+.lvb{font-size:16px;padding:8px 4px}.lvb .e{font-size:30px}
+</style>
+</head>
+<body>
+<div id="snd"><button id="mute" aria-label="Ligar ou desligar o som">🔊</button><input id="vol" type="range" min="0" max="100" value="60" aria-label="Volume"></div>
+<div class="wrap">
+
+<section id="home" class="scr on">
+<h1>🏰 Aventura Medieval</h1>
+<p class="sub">Quiz de História · 6º ano · Mundo Islâmico, África e Germânicos</p>
+<div class="lv" id="lvs">
+<button class="lvb fz" data-l="f"><span class="e">🌱</span>Fácil<small>1:30 por pergunta<br>❤️❤️❤️</small></button>
+<button class="lvb fz sel" data-l="n"><span class="e">⚔️</span>Normal<small>1:00 por pergunta<br>❤️×4</small></button>
+<button class="lvb fz" data-l="d"><span class="e">🐉</span>Difícil<small>0:30 por pergunta<br>❤️×5</small></button>
+</div>
+<button class="btn big" id="pq">▶ JOGAR O QUIZ</button>
+<button class="btn" id="ptf">✅ Verdadeiro ou Falso<small>Mesmo nível, mesmas vidas e tempo</small></button>
+<button class="btn" id="pmm">🃏 Jogo da Memória<small>Ligue cada nome ao seu significado</small></button>
+<button class="btn" id="psm">📜 Resumo para estudar<small>Leia antes de jogar</small></button>
+</section>
+
+<section id="game" class="scr">
+<div class="hud"><span class="chip" id="hearts"></span><div class="bar"><i id="tb"></i></div><span class="chip" id="tt">1:00</span></div>
+<div class="hud"><span class="chip" id="prog"></span><span class="chip" id="score">⭐ 0</span></div>
+<div class="panel" id="card"><span class="tag" id="tag"></span><p class="q" id="qt"></p><div class="opts" id="opts"></div><div id="fb"></div></div>
+<div class="row"><button class="btn" id="home1">🏠 Início</button><button class="btn" id="skip">⏭ Pular</button></div>
+</section>
+
+<section id="memo" class="scr">
+<div class="hud"><span class="chip" id="mv">Jogadas: 0</span><span class="chip" id="mp">Pares: 0/6</span></div>
+<div class="grid" id="mg"></div>
+<div class="row"><button class="btn" id="home2">🏠 Início</button><button class="btn" id="mre">🔄 Embaralhar</button></div>
+</section>
+
+<section id="sum" class="scr">
+<h1>📜 Resumo</h1><p class="sub">Leia, jogue e volte aqui quando errar</p>
+<div class="panel"><div class="fz" style="font-weight:700">Datas que caem na prova</div>
+<div class="tl"><span>Séc. VII · Islamismo</span><span>632 · Morte de Maomé</span><span>476 · Fim de Roma</span><span>800 · Carlos Magno imperador</span><span>814 · Morte de Carlos Magno</span><span>843 · Tratado de Verdun</span></div></div>
+<details open><summary>☪️ Mundo Islâmico</summary><ul>
+<li>Surgiu no século VII, na <b>Península Arábica</b> (Ásia).</li>
+<li>Religião monoteísta: um só Deus, <b>Alá</b>. Profeta: <b>Maomé</b>. Livro sagrado: <b>Alcorão</b>.</li>
+<li><b>Meca</b> (Arábia Saudita) é sagrada. A peregrinação deve ser feita ao menos uma vez na vida, por quem tem condições.</li>
+<li>Após 632, o islamismo chegou à <b>Ásia, África e Europa</b>.</li>
+<li>Comércio: tecidos, especiarias, ouro. Ciência: matemática, medicina, astronomia e filosofia. Estudiosos preservaram, traduziram e ampliaram saberes.</li></ul></details>
+<details><summary>🌍 Reinos Africanos</summary><ul>
+<li>Na África Ocidental: <b>Gana, Mali e Songai</b>.</li>
+<li><b>Gana:</b> riqueza do ouro e controle de rotas. O sal era muito valorizado (alimentação e conservação).</li>
+<li><b>Mali:</b> ouro, sal e rotas pelo <b>deserto do Saara</b>. Rei <b>Mansa Musa</b>, famoso pela riqueza e pela peregrinação a Meca. <b>Tombuctu</b> era centro comercial, religioso e de estudos.</li>
+<li><b>Songai:</b> controlava cidades e rotas. <b>Gao</b> era centro político e comercial.</li>
+<li>Trocas com comerciantes muçulmanos levaram mercadorias, ideias e religiões, mas a diversidade de crenças continuou.</li></ul></details>
+<details><summary>🛡️ Povos Germânicos</summary><ul>
+<li>Francos, visigodos, ostrogodos, vândalos e anglo-saxões. Os romanos os chamavam de <b>bárbaros</b>, mas tinham cultura e organização.</li>
+<li><b>476:</b> fim do Império Romano do Ocidente, marco do início da Idade Média. Os germânicos formaram reinos nas terras romanas.</li>
+<li><b>Clóvis</b>, rei franco, converteu-se ao cristianismo e se aproximou da Igreja.</li>
+<li><b>Carlos Magno:</b> conquistou territórios, incentivou escolas e foi coroado pelo papa Leão III em 800. Seu território: Império Carolíngio.</li>
+<li>Em <b>843</b>, o Tratado de Verdun dividiu o império entre três herdeiros.</li></ul></details>
+<button class="btn big" id="home3">🏠 Voltar ao início</button>
+</section>
+</div>
+
+<div id="over"><div class="panel"><div class="big" id="ob"></div><h2 id="ot" style="margin:6px 0"></h2><p id="op"></p><button class="btn big" id="oh">🏠 Voltar ao início</button></div></div>
+
+<script>
+const $=s=>document.querySelector(s),sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+/* ---------- Conteúdo: [pergunta, certa, [erradas], explicação] ---------- */
+const Q=[
+["Onde surgiu o islamismo?","Na Península Arábica",["Na Península Ibérica","No Egito Antigo","Na cidade de Roma"],"Surgiu no século VII, na Península Arábica, na Ásia."],
+["Quem foi o principal profeta do islamismo?","Maomé",["Clóvis","Mansa Musa","Carlos Magno"],"Maomé é o principal profeta do islamismo."],
+["Qual é o livro sagrado do islamismo?","O Alcorão",["A Torá","A Odisseia","O Timeu"],"Os ensinamentos do islamismo estão reunidos no Alcorão."],
+["Como é chamado o Deus do islamismo?","Alá",["Zeus","Júpiter","Odin"],"O islamismo é monoteísta e acredita em um único Deus, Alá."],
+["Em qual país atual fica Meca, a cidade sagrada dos muçulmanos?","Arábia Saudita",["Egito","Mali","Itália"],"Meca fica na atual Arábia Saudita."],
+["Por qual continentes o islamismo se espalhou após a morte de Maomé, em 632?","Ásia, África e Europa",["Só pela Ásia","América e Oceania","Só pela Europa"],"Após 632, a religião se espalhou pela Ásia, África e Europa."],
+["Quais produtos os comerciantes muçulmanos transportavam?","Tecidos, especiarias e ouro",["Só carros e petróleo","Só madeira","Só armas de ferro"],"Eles levavam tecidos, especiarias, ouro e outros artigos."],
+["O que os estudiosos muçulmanos fizeram com os conhecimentos de outros povos?","Preservaram, traduziram e ampliaram",["Destruíram todos","Esconderam de todos","Ignoraram"],"Eles preservaram, traduziram e ampliaram saberes de várias civilizações."],
+["Qual destas áreas recebeu contribuição dos estudiosos islâmicos?","Medicina e astronomia",["Só a pintura","Só a navegação a vapor","Nenhuma área"],"Contribuíram para matemática, medicina, astronomia e filosofia."],
+["Quais são reinos famosos da África Ocidental?","Gana, Mali e Songai",["Roma, Grécia e Egito","Francos, Godos e Vândalos","Meca, Medina e Gao"],"Gana, Mali e Songai foram os reinos mais conhecidos da região."],
+["A riqueza do Reino de Gana vinha principalmente de:","Comércio de ouro e controle de rotas",["Venda de petróleo","Fábricas de aço","Pesca no oceano"],"Gana era um centro comercial rico em ouro e controlava rotas."],
+["Por que o sal era tão valorizado?","Servia na alimentação e conservação de alimentos",["Servia para construir casas","Era usado como moeda de papel","Era enfeite de reis"],"O sal era usado na comida e para conservar alimentos."],
+["Qual deserto as caravanas africanas atravessavam?","Saara",["Atacama","Gobi","Kalahari"],"As caravanas atravessavam o Saara levando ouro, sal e outros produtos."],
+["Quem foi Mansa Musa?","Governante de Mali famoso pela riqueza",["Profeta do islamismo","Rei dos francos","Papa de Roma"],"Mansa Musa ficou famoso pela riqueza e pela peregrinação a Meca."],
+["Qual cidade de Mali foi centro comercial, religioso e de estudos?","Tombuctu",["Verdun","Meca","Aachen"],"Tombuctu ganhou destaque no governo de Mansa Musa."],
+["Qual cidade foi um importante centro político e comercial de Songai?","Gao",["Roma","Meca","Gana"],"Gao foi centro político e comercial do Songai."],
+["O que as relações com comerciantes muçulmanos levaram aos reinos africanos?","Mercadorias, conhecimentos, religiões e costumes",["Só mercadorias","Nada, não havia contato","Só guerras"],"As trocas favoreceram a circulação de bens, saberes, religiões e costumes."],
+["Por que os romanos chamavam os germânicos de bárbaros?","Eles não compartilhavam muitos costumes e a língua romana",["Eles não tinham nenhuma cultura","Eles eram sempre pacíficos","Eles moravam no deserto"],"A palavra não significa povos sem cultura ou organização."],
+["Qual destes é um povo germânico?","Francos",["Mamelucos","Fenícios","Egípcios"],"Francos, visigodos, ostrogodos, vândalos e anglo-saxões eram germânicos."],
+["O que aconteceu em 476?","Fim do Império Romano do Ocidente",["Morte de Maomé","Coroação de Carlos Magno","Tratado de Verdun"],"Esse fim marca tradicionalmente o início da Idade Média."],
+["Após a queda de Roma, o que os germânicos fizeram?","Formaram reinos nos antigos territórios romanos",["Voltaram para o deserto","Criaram o Império Islâmico","Reconstruíram Roma como era"],"Surgiram novas formas de organização política e social."],
+["Qual rei franco se converteu ao cristianismo?","Clóvis",["Mansa Musa","Maomé","Leão III"],"A conversão de Clóvis aproximou os francos da Igreja Católica."],
+["Quem coroou Carlos Magno imperador, em 800?","O papa Leão III",["O rei Clóvis","Mansa Musa","Maomé"],"A coroação mostrou a aproximação entre poder político e Igreja."],
+["Como ficou conhecido o território governado por Carlos Magno?","Império Carolíngio",["Império Otomano","Reino de Gana","Império Romano do Ocidente"],"Carlos Magno ampliou o território dos francos por conquistas."],
+["Como Carlos Magno ajudou o conhecimento?","Incentivou a educação e preservou saberes antigos",["Proibiu as escolas","Queimou os livros","Fechou a corte"],"Escolas ligadas à corte e à Igreja formaram pessoas para a administração."],
+["O que o Tratado de Verdun fez em 843?","Dividiu o Império Carolíngio entre três herdeiros",["Criou o Império Romano","Uniu todos os reinos africanos","Coroou Carlos Magno"],"A divisão enfraqueceu a unidade política do império."]
+];
+const TF=[
+["O islamismo é uma religião monoteísta.",1,"Acredita em um único Deus, Alá."],
+["Meca fica no Egito.",0,"Meca fica na atual Arábia Saudita."],
+["O Reino de Mali enriqueceu com ouro e sal.",1,"E com o controle das rotas do Saara."],
+["Os germânicos não tinham nenhuma organização.",0,"Tinham costumes, tradições e chefes próprios."],
+["O Império Romano do Ocidente chegou ao fim em 476.",1,"Esse ano marca o início da Idade Média."],
+["Carlos Magno foi coroado imperador em 843.",0,"Foi em 800. Em 843 foi assinado o Tratado de Verdun."],
+["Tombuctu foi centro de estudos e comércio.",1,"Ganhou destaque no governo de Mansa Musa."],
+["Os reinos africanos só passaram a ter cultura depois dos europeus.",0,"Já tinham estruturas políticas, economia e culturas próprias."],
+["Clóvis, rei dos francos, converteu-se ao cristianismo.",1,"Isso o aproximou da Igreja Católica."],
+["O islamismo se espalhou só pela Europa.",0,"Chegou à Ásia, à África e à Europa."],
+["Os estudiosos muçulmanos contribuíram para a medicina e a astronomia.",1,"Também para matemática e filosofia."],
+["O deserto do Saara era atravessado por caravanas de comércio.",1,"Levavam ouro, sal e outros produtos."]
+];
+const MP=[["Maomé","Profeta do islamismo"],["Alcorão","Livro sagrado"],["Meca","Cidade sagrada"],["Mansa Musa","Rei de Mali"],["Tombuctu","Centro de estudos"],["Clóvis","Rei franco cristão"],["Carlos Magno","Imperador em 800"],["Verdun","Divisão em 843"]];
+const LV={f:{t:90,l:3},n:{t:60,l:4},d:{t:30,l:5}};
+let lvl='n',g={};
+/* ---------- Áudio (sintetizado, sem arquivos) ---------- */
+let ctx,mg,sg,vol=.6,muted=0,mt,last=-1;
+const TR=[{r:262,b:120,w:'triangle',p:[0,4,7,12,7,4,0,-5,0,4,7,9,7,4,2,-1]},{r:220,b:100,w:'square',p:[0,3,7,10,7,3,0,3,5,8,12,8,5,3,0,-2]},{r:330,b:140,w:'sine',p:[0,2,4,7,9,7,4,2,0,2,4,9,7,4,2,0]},{r:196,b:90,w:'sawtooth',p:[0,7,5,3,0,7,5,3,2,9,7,5,2,9,7,5]}];
+function ac(){if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();mg=ctx.createGain();sg=ctx.createGain();mg.connect(ctx.destination);sg.connect(ctx.destination);setVol()}ctx.resume()}
+function setVol(){if(ctx){const v=muted?0:vol;mg.gain.value=v*.2;sg.gain.value=v*.6}$('#mute').textContent=muted||!vol?'🔇':'🔊'}
+function tone(f,d,w,a,dest,t0){const o=ctx.createOscillator(),n=ctx.createGain(),t=ctx.currentTime+(t0||0);o.type=w;o.frequency.value=f;n.gain.setValueAtTime(a,t);n.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(n);n.connect(dest);o.start(t);o.stop(t+d)}
+function music(){ac();clearInterval(mt);let i;do{i=Math.random()*TR.length|0}while(i===last);last=i;const T=TR[i];let s=0;mt=setInterval(()=>{const f=T.r*2**(T.p[s%16]/12);tone(f,.3,T.w,.5,mg);if(s%4==0)tone(f/2,.5,'sine',.8,mg);s++},30000/T.b)}
+function sfx(ok){if(!ctx)return;if(ok)[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.6,sg,i*.08));else{tone(220,.3,'sawtooth',.4,sg);tone(140,.4,'sawtooth',.4,sg,.15)}}
+$('#mute').onclick=()=>{ac();muted=!muted;setVol()};
+$('#vol').oninput=e=>{ac();vol=e.target.value/100;muted=0;setVol()};
+/* ---------- Navegação ---------- */
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id===id));$('#over').style.display='none';scrollTo(0,0)}
+function home(){clearInterval(g.iv);go('home')}
+['home1','home2','home3','oh'].forEach(i=>$('#'+i).onclick=home);
+document.querySelectorAll('.lvb').forEach(b=>b.onclick=()=>{lvl=b.dataset.l;document.querySelectorAll('.lvb').forEach(x=>x.classList.toggle('sel',x===b))});
+$('#pq').onclick=()=>start('quiz');$('#ptf').onclick=()=>start('tf');$('#pmm').onclick=()=>{music();memo()};$('#psm').onclick=()=>go('sum');
+/* ---------- Quiz / V ou F ---------- */
+function start(mode){
+  music();const L=LV[lvl];
+  const items=mode==='quiz'?Q.map(([q,c,w,e])=>({q,o:sh([c,...w]),a:c,e})):TF.map(([q,v,e])=>({q,o:['Verdadeiro','Falso'],a:v?'Verdadeiro':'Falso',e}));
+  g={mode,L,max:L.l,lives:L.l,queue:sh(items),total:items.length,done:0,score:0,lock:0};
+  go('game');next();
+}
+function hearts(){$('#hearts').textContent='❤️'.repeat(g.lives)+'🖤'.repeat(g.max-g.lives)}
+function next(){
+  if(!g.queue.length)return over(1);
+  g.cur=g.queue.shift();g.lock=0;
+  $('#card').classList.remove('shake');$('#fb').style.display='none';
+  $('#tag').textContent=g.mode==='quiz'?'🧠 Quiz':'✅ Verdadeiro ou Falso';
+  $('#qt').textContent=g.cur.q;
+  $('#opts').innerHTML='';
+  g.cur.o.forEach((t,i)=>{const b=document.createElement('button');b.className='opt';b.dataset.v=t;b.innerHTML=g.mode==='quiz'?'<b>'+'ABCD'[i]+'</b>':'';b.append(t);b.onclick=()=>ans(t);$('#opts').append(b)});
+  $('#prog').textContent='📚 '+g.done+'/'+g.total;$('#score').textContent='⭐ '+g.score;hearts();
+  g.end=Date.now()+g.L.t*1000;clearInterval(g.iv);g.iv=setInterval(tick,200);tick();
+}
+function tick(){
+  const left=Math.max(0,g.end-Date.now()),s=Math.ceil(left/1000);
+  $('#tt').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  const b=$('#tb');b.style.width=left/(g.L.t*10)+'%';b.style.background=s<=5?'var(--bad)':s<=g.L.t/3?'var(--gold)':'var(--ok)';
+  if(s<=5&&s>0&&ctx&&g.tk!==s){g.tk=s;tone(880,.08,'square',.3,sg)}
+  if(!left)ans(null);
+}
+function ans(t){
+  if(g.lock)return;g.lock=1;clearInterval(g.iv);g.done++;
+  const ok=t===g.cur.a;
+  document.querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(b.dataset.v===g.cur.a)b.classList.add('ok');else if(b.dataset.v===t)b.classList.add('bad')});
+  if(ok){g.score++;pop('🎉⭐✨')}else{g.lives--;$('#card').classList.add('shake')}
+  sfx(ok);if(!ok&&navigator.vibrate)navigator.vibrate(180);hearts();$('#score').textContent='⭐ '+g.score;$('#prog').textContent='📚 '+g.done+'/'+g.total;
+  const f=$('#fb');f.style.display='block';
+  f.innerHTML='<strong>'+(ok?'🎉 Mandou bem!':t===null?'⏰ O tempo acabou!':'😅 Quase! Resposta: '+g.cur.a)+'</strong>'+g.cur.e;
+  const b=document.createElement('button');b.className='btn';b.style.textAlign='center';b.textContent=g.lives<=0?'Ver resultado':'Continuar';b.onclick=()=>g.lives<=0?over(0):next();f.append(b);
+}
+$('#skip').onclick=()=>{if(g.lock)return;clearInterval(g.iv);g.queue.push(g.cur);next()};
+function over(win){
+  clearInterval(g.iv);$('#over').style.display='grid';
+  $('#ob').textContent=win?'🏆':'💔';
+  $('#ot').textContent=win?'Você zerou o jogo!':'Fim de jogo';
+  $('#op').textContent=(win?'Parabéns! ':'As vidas acabaram. ')+'Acertos: '+g.score+' de '+g.total+'.'+(win?'':' Leia o resumo e tente de novo.');
+  if(win){sfx(1);pop('🎉🏆🎊⭐')}
+}
+function pop(set){[...set].forEach((e,i)=>{const s=document.createElement('span');s.className='pop';s.textContent=e;s.style.left=(20+Math.random()*60)+'vw';s.style.top='55vh';s.style.animationDelay=i*.08+'s';document.body.append(s);setTimeout(()=>s.remove(),1500)})}
+/* ---------- Jogo da Memória ---------- */
+let M={};
+function memo(){
+  go('memo');const ps=sh(MP).slice(0,6);
+  M={open:[],moves:0,pairs:0,busy:0};
+  const cs=sh(ps.flatMap(([a,b],i)=>[{i,t:a},{i,t:b}]));
+  $('#mg').innerHTML='';
+  cs.forEach(c=>{const b=document.createElement('button');b.className='mc';b.textContent='❓';b.onclick=()=>flip(b,c);$('#mg').append(b)});
+  upd();
+}
+function upd(){$('#mv').textContent='Jogadas: '+M.moves;$('#mp').textContent='Pares: '+M.pairs+'/6'}
+function flip(b,c){
+  if(M.busy||b.classList.contains('up')||b.classList.contains('done'))return;
+  b.classList.add('up');b.textContent=c.t;M.open.push([b,c]);
+  if(M.open.length<2)return;
+  M.moves++;const[[b1,c1],[b2,c2]]=M.open;M.open=[];
+  if(c1.i===c2.i){b1.className=b2.className='mc done';M.pairs++;sfx(1);upd();if(M.pairs===6)setTimeout(()=>{g={score:6,total:6};over(1);$('#op').textContent='Você achou todos os pares em '+M.moves+' jogadas!'},500)}
+  else{M.busy=1;sfx(0);upd();setTimeout(()=>{[b1,b2].forEach(x=>{x.className='mc';x.textContent='❓'});M.busy=0},900)}
+}
+$('#mre').onclick=memo;
+document.addEventListener('click',()=>ac(),{once:true});
+document.addEventListener('touchstart',()=>ac(),{once:true,passive:true});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){g.hid=Date.now();if(ctx)ctx.suspend()}
+  else{if(g.hid&&g.end&&!g.lock)g.end+=Date.now()-g.hid;g.hid=0;if(ctx&&!muted)ctx.resume()}
+});
+</script>
+</body>
+</html>
